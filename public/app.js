@@ -24,15 +24,26 @@ function renderCategory(key){
   <div class="cat-heading"><div><span class="eyebrow">HEJWYPRAWA.PL • GOTOWE PROGRAMY SZKOLNE</span><h1>${d.title}</h1><p>${d.desc}</p></div><div class="cat-badge">🚌<strong>Pełna organizacja</strong><small>transport • bilety • rezerwacje</small></div></div>
   <form class="trip-filters" id="tripFilters">
    <label>Skąd wyjeżdżacie?<input id="from" placeholder="np. Tomaszów Mazowiecki"></label>
-   <label>Która klasa?<select id="grade"><option value="">Wybierz</option><option>1–3</option><option>4–6</option><option>7–8</option></select></label>
-   <label>Liczba uczniów<input id="students" type="number" min="1" placeholder="np. 27"></label>
+   <label>Klasa / klasy?<div class="grade-picker" id="gradePicker"><button type="button" data-grade="1">1</button><button type="button" data-grade="2">2</button><button type="button" data-grade="3">3</button><button type="button" data-grade="4">4</button><button type="button" data-grade="5">5</button><button type="button" data-grade="6">6</button><button type="button" data-grade="7">7</button><button type="button" data-grade="8">8</button></div></label>
+   <label>Liczba uczniów<input id="students" type="number" min="1" placeholder="np. 55"></label>
+   <label>Opiekunowie<input id="guardians" type="number" min="0" value="0"></label>
    <label>Budżet / uczeń<input id="budget" type="number" min="1" placeholder="np. 250 zł"></label>
    <button type="submit">POKAŻ WYCIECZKI</button>
+   <div class="transport-hint" id="transportHint">🚌 Wpisz liczbę uczniów — podpowiemy, jakiej wielkości transport może być potrzebny.</div>
   </form>
   <div class="results-head"><div><span>GOTOWE WYCIECZKI</span><h2>Wybierz program dla swojej klasy</h2></div><div class="result-count"><b id="count">${sampleTrips.length}</b> propozycji</div></div>
   <div class="trip-grid">${sampleTrips.map((t,i)=>`<article class="trip-card"><div class="trip-photo p${i+1}"><span>${t[1]}</span></div><div class="trip-body"><div class="trip-meta"><span>🎒 ${t[2]}</span><span>🕒 ${t[3]}</span></div><h3>${t[0]}</h3><p>${t[5]}</p><div class="trip-bottom"><div><small>cena za ucznia</small><strong>${t[4]}</strong></div><a href="/wycieczki/${i+1}">ZOBACZ PROGRAM →</a></div></div></article>`).join('')}</div>
   <section class="included"><h2>W każdej wycieczce organizujemy za Was</h2><div><span>🚌 <b>Transport</b><small>dobieramy autokar do grupy</small></span><span>🎟️ <b>Bilety i rezerwacje</b><small>atrakcje zgodnie z programem</small></span><span>🗓️ <b>Harmonogram</b><small>gotowy plan całego dnia</small></span><span>☎️ <b>Organizację</b><small>jedno miejsce kontaktu</small></span></div></section>
  </div>`;
+ document.querySelectorAll('#gradePicker button').forEach(btn=>btn.addEventListener('click',()=>btn.classList.toggle('active')));
+ const students=document.querySelector('#students'), guardians=document.querySelector('#guardians'), hint=document.querySelector('#transportHint');
+ function updateTransport(){
+  const u=Number(students.value)||0,g=Number(guardians.value)||0,total=u+g;
+  if(!u){hint.textContent='🚌 Wpisz liczbę uczniów — podpowiemy, jakiej wielkości transport może być potrzebny.';return}
+  let msg=total<=20?'mały bus / minibus':total<=35?'większy minibus lub mały autokar':total<=55?'jeden autokar':total<=65?'duży autokar lub wariant 2 pojazdów':'najprawdopodobniej 2 autokary';
+  hint.innerHTML='🚌 <b>'+u+' uczniów'+(g?' + '+g+' opiekunów':'')+' = '+total+' osób.</b> Orientacyjnie: <b>'+msg+'</b>. Finalny transport dobierzemy przy wycenie.';
+ }
+ students.addEventListener('input',updateTransport);guardians.addEventListener('input',updateTransport);
  document.querySelector('#tripFilters').addEventListener('submit',e=>{e.preventDefault();document.querySelector('.results-head').scrollIntoView({behavior:'smooth'});});
 }
 const m=location.pathname.match(/^\/kategoria\/([^/]+)/); if(m)renderCategory(m[1]);
