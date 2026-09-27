@@ -36,18 +36,12 @@ function renderCategory(key){
    <label>Opiekunowie<input id="guardians" type="number" min="0" value="0"></label>
    <label>Budżet / uczeń<input id="budget" type="number" min="1" placeholder="np. 250 zł"></label>
    <button type="submit">POKAŻ WYCIECZKI</button>
-   <div class="route-customizer">
-    <div class="route-customizer-head"><div><b>🗺️ Dostosuj trasę</b><small>Opcjonalnie dodaj postój po drodze</small></div><button type="button" id="addStop">+ DODAJ POSTÓJ</button></div>
-    <div id="stops"></div>
-   </div>
    <div class="transport-hint" id="transportHint">🚌 Wpisz liczbę uczniów — podpowiemy, jakiej wielkości transport może być potrzebny.</div>
   </form>
   <div class="results-head"><div><span>GOTOWE WYCIECZKI</span><h2>Wybierz program dla swojej klasy</h2></div><div class="result-count"><b id="count">${sampleTrips.length}</b> propozycji</div></div>
   <div class="trip-grid">${sampleTrips.map((t,i)=>`<article class="trip-card"><div class="trip-photo p${i+1}"><span>${t[1]}</span></div><div class="trip-body"><div class="trip-meta"><span>🎒 ${t[2]}</span><span>🕒 ${t[3]}</span></div><h3>${t[0]}</h3><p>${t[5]}</p><div class="trip-bottom"><div><small>cena za ucznia</small><strong class="trip-price" data-base="${t[4]}">od ${t[4]} zł</strong></div><a href="/wycieczki/${i+1}">ZOBACZ PROGRAM →</a></div></div></article>`).join('')}</div>
   <section class="included"><h2>W każdej wycieczce organizujemy za Was</h2><div><span>🚌 <b>Transport</b><small>dobieramy autokar do grupy</small></span><span>🎟️ <b>Bilety i rezerwacje</b><small>atrakcje zgodnie z programem</small></span><span>🗓️ <b>Harmonogram</b><small>gotowy plan całego dnia</small></span><span>☎️ <b>Organizację</b><small>jedno miejsce kontaktu</small></span></div></section>
  </div>`;
- const stops=document.querySelector('#stops'); let stopNo=0;
- document.querySelector('#addStop').addEventListener('click',()=>{stopNo++;const row=document.createElement('div');row.className='stop-row';row.innerHTML='<span class="stop-pin">📍</span><label>Miejsce postoju<input placeholder="np. McDonald’s, Łódź / konkretne miejsce"></label><label>Czas<select><option>30 min</option><option selected>1 godz.</option><option>1,5 godz.</option><option>2 godz.</option><option>3 godz.</option></select></label><button type="button" class="remove-stop">×</button>';row.querySelector('.remove-stop').onclick=()=>row.remove();stops.appendChild(row);});
  document.querySelectorAll('#gradePicker button').forEach(btn=>btn.addEventListener('click',()=>btn.classList.toggle('active')));
  const students=document.querySelector('#students'), guardians=document.querySelector('#guardians'), hint=document.querySelector('#transportHint');
  function updatePrices(u,g){
