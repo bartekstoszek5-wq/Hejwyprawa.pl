@@ -6,14 +6,14 @@ const trips=[
 ['Mandoria — dzień pełen zabawy','Rzgów','1–8','1 dzień',169,'Park rozrywki • atrakcje • transport'],
 ['Góry Świętokrzyskie — przygoda','Świętokrzyskie','3–8','1 dzień',219,'Szlak • natura • atrakcje regionalne']];
 const cats=[
-['yellow','🚌','WYCIECZKI 1-DNIOWE','Gotowe programy z transportem','wycieczki-1-dniowe'],
-['blue','🏰','HISTORIA I ZWIEDZANIE','Zamki • Pałace • Muzea • Miasta','historia'],
-['purple','🔭','NAUKA I ODKRYWANIE','Centra nauki • Planetaria • Warsztaty','nauka'],
-['orange','🎢','ZABAWA I ATRAKCJE','Parki rozrywki • Aquaparki • Parki trampolin','zabawa'],
-['green','⛰️','NATURA I PRZYGODA','Zoo • Góry • Jaskinie • Parki linowe','natura'],
-['pink','🏙️','WYCIECZKI DO MIAST','Warszawa • Kraków • Łódź • Wrocław • Toruń','miasta']];
+['yellow','bus','WYCIECZKI 1-DNIOWE','Gotowe programy z transportem','wycieczki-1-dniowe'],
+['blue','castle','HISTORIA I ZWIEDZANIE','Zamki • Pałace • Muzea • Miasta','historia'],
+['purple','science','NAUKA I ODKRYWANIE','Centra nauki • Planetaria • Warsztaty','nauka'],
+['orange','fun','ZABAWA I ATRAKCJE','Parki rozrywki • Aquaparki • Parki trampolin','zabawa'],
+['green','nature','NATURA I PRZYGODA','Zoo • Góry • Jaskinie • Parki linowe','natura'],
+['pink','city','WYCIECZKI DO MIAST','Warszawa • Kraków • Łódź • Wrocław • Toruń i więcej','miasta']];
 const app=document.querySelector('#app');
-function home(){app.innerHTML=`<section class="home-hero"><div class="brand main-logo"><b>hej</b><span>wyprawa</span><i>.pl</i><em>➤</em></div><h1>Wybierz temat wycieczki</h1><p class="lead">GOTOWE PROGRAMY • TRANSPORT • REZERWACJE • PEŁNA ORGANIZACJA</p><div class="cards">${cats.map(c=>`<a class="card ${c[0]}" href="/kategoria/${c[4]}"><div class="pic">${c[1]}</div><h2>${c[2]}</h2><p>${c[3]}</p><span>→</span></a>`).join('')}</div></section>`}
+function home(){app.innerHTML=`<section class="home-hero"><div class="cloud cloud-a"></div><div class="cloud cloud-b"></div><div class="poland-scene"><span class="scene-mountain"></span><span class="scene-castle">♜</span><span class="scene-city"></span><span class="scene-river"></span></div><div class="home-copy"><div class="brand main-logo"><b>hej</b><span>wyprawa</span><i>.pl</i><em>➤</em></div><h1>Wybierz temat wycieczki</h1><p class="lead">GOTOWE PROGRAMY • TRANSPORT • REZERWACJE • PEŁNA ORGANIZACJA</p></div><div class="cards">${cats.map(c=>`<a class="card ${c[0]}" href="/kategoria/${c[4]}"><div class="sign-plank"></div><div class="pic ${c[1]}"><i></i></div><h2>${c[2]}</h2><p>${c[3]}</p><span>→</span></a>`).join('')}</div><div class="hero-fade"></div></section>`}
 function filters(){return `<form class="trip-filters"><label>Skąd wyjeżdżacie?<input placeholder="np. Łódź"></label><label>Klasa / klasy?<div class="grade-picker">${[1,2,3,4,5,6,7,8].map(x=>`<button type="button">${x}</button>`).join('')}</div></label><label>Liczba uczniów<input type="number" placeholder="np. 55"></label><label>Opiekunowie<input type="number" value="0"></label><label>Budżet / uczeń<input type="number" placeholder="np. 250 zł"></label><button>POKAŻ WYCIECZKI</button></form>`}
 function grid(){return `<div class="trip-grid">${trips.map((t,i)=>`<article class="trip-card"><div class="trip-photo p${i+1}"><span>${t[1]}</span></div><div class="trip-body"><div class="trip-meta">🎒 ${t[2]}　🕒 ${t[3]}</div><h3>${t[0]}</h3><p>${t[5]}</p><div class="trip-bottom"><div><small>cena za ucznia</small><strong>od ${t[4]} zł</strong></div><a href="/wycieczki/${i+1}">ZOBACZ PROGRAM →</a></div></div></article>`).join('')}</div>`}
 function offer(title='Nasza oferta'){app.innerHTML=`<section class="page-hero"><div class="wood-sign"><h1>${title}</h1><p>Gotowe wycieczki szkolne po Polsce</p></div><div class="hero-kids">🎒 🚌 🇵🇱</div></section><div class="content"><h2>Znajdź wycieczkę dla swojej klasy</h2>${filters()}<div class="section-title"><h2>Polecane wycieczki szkolne</h2><p>Transport, rezerwacje i gotowy program w jednym miejscu.</p></div>${grid()}</div>`;bind()}
