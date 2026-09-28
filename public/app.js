@@ -1,61 +1,26 @@
-const categoryData={
-  'wycieczki-1-dniowe':{title:'Wycieczki 1-dniowe',desc:'Gotowe jednodniowe wyjazdy szkolne z transportem, rezerwacjami i pełnym planem dnia.'},
-  historia:{title:'Historia i zwiedzanie',desc:'Zamki, pałace, muzea i miasta — programy dopasowane do wieku uczniów.'},
-  nauka:{title:'Nauka i odkrywanie',desc:'Centra nauki, planetaria i warsztaty, które łączą wyjazd z odkrywaniem.'},
-  zabawa:{title:'Zabawa i atrakcje',desc:'Parki rozrywki, aquaparki, trampoliny i inne wyjazdy pełne dobrej zabawy.'},
-  natura:{title:'Natura i przygoda',desc:'Zoo, góry, jaskinie, parki linowe i aktywne wycieczki w naturze.'},
-  miasta:{title:'Wycieczki do miast',desc:'Gotowe programy wyjazdów do Warszawy, Krakowa, Łodzi, Wrocławia, Torunia i innych miast.'}
-};
-const sampleTrips=[
- ['Warszawa — Centrum Nauki Kopernik','Warszawa','1–8','1 dzień',189,'Eksperymenty • Stare Miasto • spacer'],
- ['Łódź — Orientarium i ZOO','Łódź','1–8','1 dzień',159,'Orientarium • ZOO • czas na posiłek'],
- ['Toruń — miasto Kopernika','Toruń','2–8','1 dzień',199,'Planetarium • Stare Miasto • pierniki'],
- ['Warszawa — historia i zwiedzanie','Warszawa','4–8','1 dzień',179,'Stare Miasto • Łazienki • najważniejsze zabytki'],
- ['Mandoria — dzień pełen zabawy','Rzgów','1–8','1 dzień',169,'Park rozrywki • atrakcje • transport'],
- ['Góry Świętokrzyskie — przygoda','Świętokrzyskie','3–8','1 dzień',219,'Szlak • natura • atrakcje regionalne']
-];
-function estimatePrice(base,students,guardians){
- if(!students)return base;
- const total=students+(guardians||0);
- let transportAdj=0;
- if(total<=20)transportAdj=55; else if(total<=30)transportAdj=28; else if(total<=45)transportAdj=10; else if(total<=55)transportAdj=0; else if(total<=65)transportAdj=32; else transportAdj=48;
- return Math.max(base-12,Math.round(base+transportAdj));
-}
-function renderCategory(key){
- const d=categoryData[key]; if(!d)return;
- const hero=document.querySelector('.hero'); document.querySelector('#intro')?.remove();
- document.body.classList.add('category-page');
- hero.innerHTML=`
- <div class="cat-wrap">
-  <a class="back-home" href="/">← Strona główna</a>
-  <div class="cat-heading"><div><span class="eyebrow">HEJWYPRAWA.PL • GOTOWE PROGRAMY SZKOLNE</span><h1>${d.title}</h1><p>${d.desc}</p></div><div class="cat-badge">🚌<strong>Pełna organizacja</strong><small>transport • bilety • rezerwacje</small></div></div>
-  <form class="trip-filters" id="tripFilters">
-   <label>Skąd wyjeżdżacie?<input id="from" placeholder="np. Tomaszów Mazowiecki"></label>
-   <label>Klasa / klasy?<div class="grade-picker" id="gradePicker"><button type="button" data-grade="1">1</button><button type="button" data-grade="2">2</button><button type="button" data-grade="3">3</button><button type="button" data-grade="4">4</button><button type="button" data-grade="5">5</button><button type="button" data-grade="6">6</button><button type="button" data-grade="7">7</button><button type="button" data-grade="8">8</button></div></label>
-   <label>Liczba uczniów<input id="students" type="number" min="1" placeholder="np. 55"></label>
-   <label>Opiekunowie<input id="guardians" type="number" min="0" value="0"></label>
-   <label>Budżet / uczeń<input id="budget" type="number" min="1" placeholder="np. 250 zł"></label>
-   <button type="submit">POKAŻ WYCIECZKI</button>
-   <div class="transport-hint" id="transportHint">🚌 Wpisz liczbę uczniów — podpowiemy, jakiej wielkości transport może być potrzebny.</div>
-  </form>
-  <div class="results-head"><div><span>GOTOWE WYCIECZKI</span><h2>Wybierz program dla swojej klasy</h2></div><div class="result-count"><b id="count">${sampleTrips.length}</b> propozycji</div></div>
-  <div class="trip-grid">${sampleTrips.map((t,i)=>`<article class="trip-card"><div class="trip-photo p${i+1}"><span>${t[1]}</span></div><div class="trip-body"><div class="trip-meta"><span>🎒 ${t[2]}</span><span>🕒 ${t[3]}</span></div><h3>${t[0]}</h3><p>${t[5]}</p><div class="trip-bottom"><div><small>cena za ucznia</small><strong class="trip-price" data-base="${t[4]}">od ${t[4]} zł</strong></div><a href="/wycieczki/${i+1}">ZOBACZ PROGRAM →</a></div></div></article>`).join('')}</div>
-  <section class="included"><h2>W każdej wycieczce organizujemy za Was</h2><div><span>🚌 <b>Transport</b><small>dobieramy autokar do grupy</small></span><span>🎟️ <b>Bilety i rezerwacje</b><small>atrakcje zgodnie z programem</small></span><span>🗓️ <b>Harmonogram</b><small>gotowy plan całego dnia</small></span><span>☎️ <b>Organizację</b><small>jedno miejsce kontaktu</small></span></div></section>
- </div>`;
- document.querySelectorAll('#gradePicker button').forEach(btn=>btn.addEventListener('click',()=>btn.classList.toggle('active')));
- const students=document.querySelector('#students'), guardians=document.querySelector('#guardians'), hint=document.querySelector('#transportHint');
- function updatePrices(u,g){
-  document.querySelectorAll('.trip-price').forEach(el=>{const base=Number(el.dataset.base);el.textContent=(u?'ok. ':'od ')+estimatePrice(base,u,g)+' zł';});
-  const budget=Number(document.querySelector('#budget').value)||0;
-  document.querySelectorAll('.trip-card').forEach(card=>{const price=Number(card.querySelector('.trip-price').textContent.replace(/\D/g,''));card.classList.toggle('over-budget',!!budget&&price>budget);});
- }
- function updateTransport(){
-  const u=Number(students.value)||0,g=Number(guardians.value)||0,total=u+g; updatePrices(u,g);
-  if(!u){hint.textContent='🚌 Wpisz liczbę uczniów — podpowiemy, jakiej wielkości transport może być potrzebny.';return}
-  let msg=total<=20?'mały bus / minibus':total<=35?'większy minibus lub mały autokar':total<=55?'jeden autokar':total<=65?'duży autokar lub wariant 2 pojazdów':'najprawdopodobniej 2 autokary';
-  hint.innerHTML='🚌 <b>'+u+' uczniów'+(g?' + '+g+' opiekunów':'')+' = '+total+' osób.</b> Orientacyjnie: <b>'+msg+'</b>. Finalny transport dobierzemy przy wycenie.';
- }
- students.addEventListener('input',updateTransport);guardians.addEventListener('input',updateTransport);document.querySelector('#budget').addEventListener('input',()=>updatePrices(Number(students.value)||0,Number(guardians.value)||0));
- document.querySelector('#tripFilters').addEventListener('submit',e=>{e.preventDefault();document.querySelector('.results-head').scrollIntoView({behavior:'smooth'});});
-}
-const m=location.pathname.match(/^\/kategoria\/([^/]+)/); if(m)renderCategory(m[1]);
+const trips=[
+['Warszawa — Centrum Nauki Kopernik','Warszawa','1–8','1 dzień',189,'Eksperymenty • Stare Miasto • spacer'],
+['Łódź — Orientarium i ZOO','Łódź','1–8','1 dzień',159,'Orientarium • ZOO • czas na posiłek'],
+['Toruń — miasto Kopernika','Toruń','2–8','1 dzień',199,'Planetarium • Stare Miasto • pierniki'],
+['Warszawa — historia i zwiedzanie','Warszawa','4–8','1 dzień',179,'Stare Miasto • Łazienki • najważniejsze zabytki'],
+['Mandoria — dzień pełen zabawy','Rzgów','1–8','1 dzień',169,'Park rozrywki • atrakcje • transport'],
+['Góry Świętokrzyskie — przygoda','Świętokrzyskie','3–8','1 dzień',219,'Szlak • natura • atrakcje regionalne']];
+const cats=[
+['yellow','🚌','WYCIECZKI 1-DNIOWE','Gotowe programy z transportem','wycieczki-1-dniowe'],
+['blue','🏰','HISTORIA I ZWIEDZANIE','Zamki • Pałace • Muzea • Miasta','historia'],
+['purple','🔭','NAUKA I ODKRYWANIE','Centra nauki • Planetaria • Warsztaty','nauka'],
+['orange','🎢','ZABAWA I ATRAKCJE','Parki rozrywki • Aquaparki • Parki trampolin','zabawa'],
+['green','⛰️','NATURA I PRZYGODA','Zoo • Góry • Jaskinie • Parki linowe','natura'],
+['pink','🏙️','WYCIECZKI DO MIAST','Warszawa • Kraków • Łódź • Wrocław • Toruń','miasta']];
+const app=document.querySelector('#app');
+function home(){app.innerHTML=`<section class="home-hero"><div class="brand main-logo"><b>hej</b><span>wyprawa</span><i>.pl</i><em>➤</em></div><h1>Wybierz temat wycieczki</h1><p class="lead">GOTOWE PROGRAMY • TRANSPORT • REZERWACJE • PEŁNA ORGANIZACJA</p><div class="cards">${cats.map(c=>`<a class="card ${c[0]}" href="/kategoria/${c[4]}"><div class="pic">${c[1]}</div><h2>${c[2]}</h2><p>${c[3]}</p><span>→</span></a>`).join('')}</div></section>`}
+function filters(){return `<form class="trip-filters"><label>Skąd wyjeżdżacie?<input placeholder="np. Łódź"></label><label>Klasa / klasy?<div class="grade-picker">${[1,2,3,4,5,6,7,8].map(x=>`<button type="button">${x}</button>`).join('')}</div></label><label>Liczba uczniów<input type="number" placeholder="np. 55"></label><label>Opiekunowie<input type="number" value="0"></label><label>Budżet / uczeń<input type="number" placeholder="np. 250 zł"></label><button>POKAŻ WYCIECZKI</button></form>`}
+function grid(){return `<div class="trip-grid">${trips.map((t,i)=>`<article class="trip-card"><div class="trip-photo p${i+1}"><span>${t[1]}</span></div><div class="trip-body"><div class="trip-meta">🎒 ${t[2]}　🕒 ${t[3]}</div><h3>${t[0]}</h3><p>${t[5]}</p><div class="trip-bottom"><div><small>cena za ucznia</small><strong>od ${t[4]} zł</strong></div><a href="/wycieczki/${i+1}">ZOBACZ PROGRAM →</a></div></div></article>`).join('')}</div>`}
+function offer(title='Nasza oferta'){app.innerHTML=`<section class="page-hero"><div class="wood-sign"><h1>${title}</h1><p>Gotowe wycieczki szkolne po Polsce</p></div><div class="hero-kids">🎒 🚌 🇵🇱</div></section><div class="content"><h2>Znajdź wycieczkę dla swojej klasy</h2>${filters()}<div class="section-title"><h2>Polecane wycieczki szkolne</h2><p>Transport, rezerwacje i gotowy program w jednym miejscu.</p></div>${grid()}</div>`;bind()}
+function about(){app.innerHTML=`<section class="page-hero"><div class="wood-sign"><h1>O NAS</h1><p>Tworzymy wycieczki, które zostają w pamięci na długo!</p></div><div class="hero-kids">🗺️ 🎒 🚌</div></section><div class="content about"><div class="benefits"><div>👥<b>Wycieczki dla szkół</b><small>Programy dopasowane do wieku i grupy</small></div><div>🚌<b>Sprawdzony transport</b><small>Dobieramy pojazd do liczby uczestników</small></div><div>📍<b>Najciekawsze miejsca</b><small>Edukacja, rozrywka i przygoda</small></div><div>❤️<b>Wsparcie organizacyjne</b><small>Od zapytania aż do wyjazdu</small></div></div><div class="about-grid"><div class="photo-panel">🏰<br><span>Podróże uczą • łączą • inspirują</span></div><div><h2>Nasza misja</h2><p>Wierzymy, że podróże kształcą, rozwijają i łączą ludzi. Tworzymy szkolne wyjazdy, które są prawdziwą przygodą i pełnym nowych doświadczeń dniem poza szkołą.</p><h2>Co nas wyróżnia?</h2><p>✓ Gotowe, dopracowane programy<br>✓ Elastyczne dopasowanie do wieku i potrzeb grupy<br>✓ Transport i rezerwacje w jednym miejscu<br>✓ Wsparcie na każdym etapie organizacji</p></div></div></div>`}
+function contact(){app.innerHTML=`<section class="page-hero"><div class="wood-sign"><h1>KONTAKT</h1><p>Porozmawiajmy o Waszej wycieczce szkolnej!</p></div><div class="hero-kids">📨 🎒 ⛰️</div></section><div class="content contact-grid"><form class="contact-form"><h2>✈ Napisz do nas</h2><p>Opowiedz nam, jaką wycieczkę planujesz — przygotujemy ofertę dopasowaną do Twojej klasy.</p><div class="two"><input placeholder="Imię i nazwisko"><input placeholder="Szkoła / placówka"><input placeholder="Numer telefonu"><input placeholder="Adres e-mail"></div><input placeholder="Klasa / klasy"><textarea placeholder="Kierunek, liczba uczniów, termin, budżet, dodatkowe wymagania"></textarea><button>Wyślij wiadomość</button></form><aside><div class="info-card"><h3>☎ Telefon</h3><b>+48 123 456 789</b></div><div class="info-card"><h3>✉ E-mail</h3><b>kontakt@hejwyprawa.pl</b></div><div class="info-card"><h3>📍 Nasza lokalizacja</h3><b>Łódź</b><p>Działamy na terenie całej Polski.</p></div><div class="mapbox">📍 ŁÓDŹ<br><small>Obsługujemy szkoły w całej Polsce</small></div></aside></div>`}
+function detail(){let t=trips[(Number(location.pathname.split('/').pop())||1)-1]||trips[0];app.innerHTML=`<div class="trip-detail"><section class="trip-hero"><div class="wood-sign"><small>GOTOWA WYCIECZKA SZKOLNA</small><h1>${t[0]}</h1></div><div class="hero-price"><small>od</small><b>${t[4]} zł</b><small>za ucznia</small></div></section><div class="trip-facts">📍 ${t[1]}　 🎒 klasy ${t[2]}　 🕒 ${t[3]}　 🚌 transport</div><div class="trip-columns"><div><section class="white-panel"><h2>Program wycieczki</h2><div class="timeline"><p><b>07:00</b> Wyjazd spod szkoły</p><p><b>10:00</b> Pierwszy punkt programu</p><p><b>12:30</b> Przerwa i czas na posiłek</p><p><b>14:00</b> Dalsze zwiedzanie i atrakcje</p><p><b>17:00</b> Wyjazd w drogę powrotną</p></div></section><section class="white-panel"><h2>W cenie organizujemy</h2><p>🚌 transport　🎟️ rezerwacje i bilety　🗓️ harmonogram　☎️ organizację</p></section></div><aside class="white-panel"><h2>Dostosuj program</h2><p>Dodatkowe miejsce możesz dodać dopiero po wybraniu konkretnej wycieczki.</p><button class="add-stop">+ DODAJ PRZYSTANEK</button><div id="stops"></div><div class="detail-estimate">Orientacyjna cena: <b>od ${t[4]} zł/os.</b><br>Dokładny czas i koszt potwierdzimy w ofercie.</div><a class="ask-trip" href="/zapytanie">ZAPYTAJ O TĘ WYCIECZKĘ</a></aside></div></div>`;document.querySelector('.add-stop').onclick=()=>document.querySelector('#stops').insertAdjacentHTML('beforeend','<div class="detail-stop"><input placeholder="Miejsce / atrakcja"><select><option>1 godz.</option><option>2 godz.</option><option>3 godz.</option></select><button onclick="this.parentElement.remove()">×</button></div>')}
+function inquiry(){app.innerHTML=`<div class="trip-detail"><div class="steps"><b>1. Wycieczka ✓</b><b>2. Dostosowanie ✓</b><strong>3. Zapytanie</strong></div><section class="white-panel inquiry-form"><h1>Ostatni krok — wyślij zapytanie</h1><p class="compact-summary">Wybrana wycieczka • program i grupa zostają zachowane</p><div class="two"><label>Preferowana data<input type="date"></label><label>Godzina wyjazdu<input type="time"></label><label>Imię i nazwisko<input></label><label>Telefon<input></label><label>E-mail<input></label><label>Szkoła<input></label></div><label>Uwagi<textarea></textarea></label><button class="send-inquiry">WYŚLIJ ZAPYTANIE</button></section></div>`;document.querySelector('.send-inquiry').onclick=()=>{history.pushState({},'', '/dziekujemy');thanks()}}
+function thanks(){app.innerHTML=`<div class="thanks-page"><div class="thanks-sign">DZIĘKUJEMY!</div><h1>Zapytanie zostało przygotowane</h1><p>Skontaktujemy się w sprawie szczegółów wycieczki.</p><a class="ask-trip" href="/">WRÓĆ NA STRONĘ GŁÓWNĄ</a></div>`}
+function bind(){document.querySelectorAll('.grade-picker button').forEach(b=>b.onclick=()=>b.classList.toggle('active'));document.querySelector('.trip-filters')?.addEventListener('submit',e=>e.preventDefault())}
+let p=location.pathname;if(p==='/')home();else if(p==='/o-nas')about();else if(p==='/oferta')offer();else if(p==='/kontakt')contact();else if(p.startsWith('/kategoria/'))offer('Wybierz program wycieczki');else if(p.startsWith('/wycieczki/'))detail();else if(p==='/zapytanie')inquiry();else if(p==='/dziekujemy')thanks();else home();
